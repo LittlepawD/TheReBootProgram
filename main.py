@@ -1,9 +1,8 @@
 import PySimpleGUI.PySimpleGUI as sg
 import random as rn
+from the_reboot_fork.modules.quotes import quotes_load
 
 # TODO: Create file with motivational quotes
-QUOTES = ("You can do it!", "Success is the sum of small efforts, repeated day after day.")
-
 
 class RBProgram:
     # TODO: Eventually move this to a separate module
@@ -20,7 +19,7 @@ def create_layout(RBClass):
     # TODO: Order the optionbar to topleft corner, order buttons next to each other
     options_bar = [sg.Button("set streak"), sg.Button("diary"), sg.Button("options")]
     streak_bar = [sg.Text(f"Streak: {RBClass.streak}"), sg.Text(f"Goal: {RBClass.goal}")]
-    quote = [sg.Text(rn.choice(QUOTES))]
+    quote = [sg.Text(quote_data)]
 
     layout = [
         options_bar,
@@ -37,6 +36,7 @@ if __name__ == "__main__":
     SAVED_DATA = None   # TODO Prepare saved data file (format - .py module?)
     Program = RBProgram(SAVED_DATA)
     # Create window:
+    quote_data = quotes_load()
     layout = create_layout(Program)
     window = sg.Window("The Rebooot Program", layout, icon=None)  # TODO: add custom icon
 
