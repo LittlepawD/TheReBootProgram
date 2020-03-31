@@ -37,10 +37,11 @@ if __name__ == "__main__":
     Program = RBProgram(SAVED_DATA)
     # Create window:
     quote_data = quotes_load()
+    sg.theme("DarkBrown1")
     layout = create_layout(Program)
     window = sg.Window("The Rebooot Program", layout, icon=None)  # TODO: add custom icon
 
-    # Mainloop:
+    # Mainloop:v
     while True:
         event, values = window.read()
         if event in (None, 'Cancel'):
