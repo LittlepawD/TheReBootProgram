@@ -2,6 +2,7 @@ import PySimpleGUI.PySimpleGUI as sg
 import random as rn
 from the_reboot_fork.modules.quotes import quotes_load
 
+
 # TODO: Create file with motivational quotes
 
 class RBProgram:
@@ -30,10 +31,11 @@ def create_layout(RBClass):
 
     return layout
 
+
 if __name__ == "__main__":
 
     # Init RBClass:
-    SAVED_DATA = None   # TODO Prepare saved data file (format - .py module?)
+    SAVED_DATA = None  # TODO Prepare saved data file (format - .py module?)
     Program = RBProgram(SAVED_DATA)
     # Create window:
     quote_data = quotes_load()
