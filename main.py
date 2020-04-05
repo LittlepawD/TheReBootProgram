@@ -1,6 +1,6 @@
 import PySimpleGUI.PySimpleGUI as sg
 import random as rn
-from the_reboot_fork.modules.quotes import quotes_load
+from modules.quotes import quotes_load  # Had to change this line for compatability
 
 
 # TODO: Create file with motivational quotes
