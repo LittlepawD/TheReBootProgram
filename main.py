@@ -1,6 +1,6 @@
 import PySimpleGUI.PySimpleGUI as sg
 import random as rn
-from modules.quotes import quotes_load  # Had to change this line for compatability
+from modules.quotes import quotes_load  # Working now for me
 
 
 # TODO: Create file with motivational quotes
