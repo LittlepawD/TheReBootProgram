@@ -1,6 +1,7 @@
 import PySimpleGUI.PySimpleGUI as sg
 import random as rn
-from modules.quotes import quotes_load  # Working now for me
+import webbrowser
+from modules.quotes import quotes_load
 
 
 # TODO: Create file with motivational quotes
@@ -17,17 +18,31 @@ class RBProgram:
 
 
 def create_layout(RBClass):
-    # TODO: Order the optionbar to topleft corner, order buttons next to each other
-    options_bar = [sg.Button("set streak"), sg.Button("diary"), sg.Button("options")]
-    streak_bar = [sg.Text(f"Streak: {RBClass.streak}"), sg.Text(f"Goal: {RBClass.goal}")]
+    menu_def = [["&Goal", ["Reset", "Edit",]],
+                 ["&Diary", ["Open", "Export",]],
+                 ["&Options"],
+                 ["Help", ["Github Page", "NoFap"]]]
+    options_bar = [sg.Menu(menu_def)]
+
+    streak_bar_font = ("Helvetica", 20)
+    streak_bar = [sg.Text(f"Streak: {RBClass.streak}", font=streak_bar_font),
+                sg.VerticalSeparator(),
+                sg.Text(f"Goal: {RBClass.goal}", font=streak_bar_font)]
+
     quote = [sg.Text(quote_data)]
+
+    col_calendar = [[sg.Text("Calendar placeholder")]]
+    col_buttons = [[sg.Button("Calendar f1")],
+                    [sg.Button("Calendar f2")],
+                    [sg.Button("Calendar f3")]]
+    calendar_bar = [sg.Frame("Calendar", col_calendar, size=(350, 260)), 
+                    sg.Column(col_buttons, element_justification="center",)]
 
     layout = [
         options_bar,
         streak_bar,
         quote,
-        [sg.Text('placeholder')]
-    ]
+        calendar_bar]
 
     return layout
 
@@ -41,13 +56,24 @@ if __name__ == "__main__":
     quote_data = quotes_load()
     sg.theme("DarkBrown1")
     layout = create_layout(Program)
-    window = sg.Window("The Rebooot Program", layout, icon=None)  # TODO: add custom icon
+    window = sg.Window("The Rebooot Program", layout,  resizable=True, icon=None)  # TODO: add custom icon
 
-    # Mainloop:v
+    # Mainloop:
     while True:
         event, values = window.read()
+
+        # For debugging:
+        print(event)
+        print(values, "\n")
+
         if event in (None, 'Cancel'):
             break
 
+        # Events from help menu:
+        if event in ("Github Page"):
+            webbrowser.open("https://github.com/LittlepawD/TheReBootProgram")
+
+        if event in ("NoFap"):
+            webbrowser.open("https://nofap.com/")
     # End:
     window.close()
