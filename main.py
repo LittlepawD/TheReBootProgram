@@ -1,24 +1,29 @@
 import PySimpleGUI.PySimpleGUI as sg
 import random as rn
 import webbrowser
+
 from modules.quotes import quotes_load
+import modules.appdata as appdata
 
 
 # TODO: Create file with motivational quotes
 
 class RBProgram:
     # TODO: Eventually move this to a separate module
-    def __init__(self, DATA):
-        # TODO: get saved data from DATA and assign to variables
+    def __init__(self):
         self.goal = None
         self.streak = None
+        self.start_date = None
+
+    def __str__(self):
+        return f"{self.goal} days goal started on {self.start_date}."
 
     def set_goal(self, goal):
         self.goal = goal
 
 
 def create_layout(RBClass):
-    menu_def = [["&Goal", ["Reset", "Edit",]],
+    menu_def = [["&Goal", ["New Goal", "Edit Goal",]],
                  ["&Diary", ["Open", "Export",]],
                  ["&Options"],
                  ["Help", ["Github Page", "NoFap"]]]
@@ -46,17 +51,35 @@ def create_layout(RBClass):
 
     return layout
 
+def create_goal_layout (RBClass, edit):
+    # To put to respective elements
+    if edit:
+        goal_val = RBClass.goal
+        startdate_val = RBClass.start_date
+    else:
+        goal_val = None
+        startdate_val = None
+ 
+    layout = [[sg.Text("Goal")]]
+            # [sg.Button("OK")], [sg.CloseButton("Close")]]
+
 
 if __name__ == "__main__":
 
-    # Init RBClass:
-    SAVED_DATA = None  # TODO Prepare saved data file (format - .py module?)
-    Program = RBProgram(SAVED_DATA)
+    # Load program class:
+    program = appdata.load()
+    print(program)
+    # If program class was not yet created, init new one.
+    if program is None:
+        print("Initializing new program instance...")
+        program = RBProgram()
+
+
     # Create window:
     quote_data = quotes_load()
     sg.theme("DarkBrown1")
-    layout = create_layout(Program)
-    window = sg.Window("The Rebooot Program", layout,  resizable=True, icon=None)  # TODO: add custom icon
+    layout = create_layout(program)
+    window = sg.Window("The Rebooot program", layout,  resizable=True, icon=None)  # TODO: add custom icon
 
     # Mainloop:
     while True:
@@ -69,6 +92,27 @@ if __name__ == "__main__":
         if event in (None, 'Cancel'):
             break
 
+        #Events from goal menu:
+        if event in ("Edit Goal", "New Goal"):
+            if event == "Edit Goal":
+                edit = True
+            else: 
+                edit = False
+
+            # Create and launch goal window, blocking:
+            # Work in progress, Throws ValueError
+            # goal_layout = create_goal_layout(program, edit)
+            # goal_window = sg.Window("Set Goal", goal_layout)
+            # while True:
+            #     g_event, g_value = goal_window.Read(timeout=1000)
+            #     if g_event in (None, "Close"):
+            #         break
+                
+            #     if g_event in ("OK"):
+            #         # TODO: Save values to program class here
+            #         print("ok")
+            #         break
+
         # Events from help menu:
         if event in ("Github Page"):
             webbrowser.open("https://github.com/LittlepawD/TheReBootProgram")
@@ -76,4 +120,7 @@ if __name__ == "__main__":
         if event in ("NoFap"):
             webbrowser.open("https://nofap.com/")
     # End:
+    appdata.save(program)
     window.close()
+
+    # TODO: Save data and log on program crash

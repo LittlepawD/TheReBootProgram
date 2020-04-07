@@ -3,8 +3,9 @@ import json
 import os
 
 
-# TODO: Change the ubication of the json file
+# Maybe integrate this to appdata module
 
+# TODO: Change the ubication of the json file
 
 def quotes_load():
 
