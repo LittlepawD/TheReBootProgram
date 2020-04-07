@@ -14,6 +14,7 @@ class RBProgram:
         self.goal = None
         self.streak = None
         self.start_date = None
+        self.why_I_quit = ""    # Maybe move this one in some kinda dictionary, integrated with diary
 
     def __str__(self):
         return f"{self.goal} days goal started on {self.start_date}."
@@ -21,7 +22,7 @@ class RBProgram:
     def set_goal(self, goal):
         self.goal = goal
 
-
+# TODO: Move layouts creations to layouts module
 def create_layout(RBClass):
     menu_def = [["&Goal", ["New Goal", "Edit Goal",]],
                  ["&Diary", ["Open", "Export",]],
@@ -57,11 +58,16 @@ def create_goal_layout (RBClass, edit):
         goal_val = RBClass.goal
         startdate_val = RBClass.start_date
     else:
-        goal_val = None
+        goal_val = 30
         startdate_val = None
  
-    layout = [[sg.Text("Goal")]]
-            # [sg.Button("OK")], [sg.CloseButton("Close")]]
+    layout = [[sg.Text("Duration of challange: "), sg.Spin([n for n in range(1,1000)], goal_val, key="-duration-")],
+        # TODO add today date and date handling using datetime
+            [sg.Text("I'm starting on "), sg.InputText("todaydate", key="-date-")],
+            [sg.Text("This is why I want to quit:")],
+            [sg.Multiline(RBClass.why_I_quit, key="-whyIquit-")],
+            [sg.Button("OK"), sg.CloseButton("Close")]]
+    return layout
 
 
 if __name__ == "__main__":
@@ -70,6 +76,7 @@ if __name__ == "__main__":
     program = appdata.load()
     print(program)
     # If program class was not yet created, init new one.
+    # TODO: init new class if changes were made in class too 
     if program is None:
         print("Initializing new program instance...")
         program = RBProgram()
@@ -100,18 +107,21 @@ if __name__ == "__main__":
                 edit = False
 
             # Create and launch goal window, blocking:
-            # Work in progress, Throws ValueError
-            # goal_layout = create_goal_layout(program, edit)
-            # goal_window = sg.Window("Set Goal", goal_layout)
-            # while True:
-            #     g_event, g_value = goal_window.Read(timeout=1000)
-            #     if g_event in (None, "Close"):
-            #         break
+            goal_layout = create_goal_layout(program, edit)
+            # Kinda buggy when new widnow is opened, try fixing it
+            goal_window = sg.Window("Set Goal", goal_layout)
+            while True:
+                g_event, g_value = goal_window.read()
+
+                # Throws TypeError
+                if g_event in (None, "Close"):
+                    goal_window.Close()
                 
-            #     if g_event in ("OK"):
-            #         # TODO: Save values to program class here
-            #         print("ok")
-            #         break
+                # Throws TypeError
+                if g_event in ("OK"):
+                    # TODO: Save values to program class here
+                    print(g_value["-duration-"], g_value["-date-"])
+                    goal_window.Close()
 
         # Events from help menu:
         if event in ("Github Page"):
