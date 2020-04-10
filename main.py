@@ -1,10 +1,21 @@
 import PySimpleGUI.PySimpleGUI as sg
 import random as rn
 import webbrowser
+import logging
 
 from modules.quotes import quotes_load
 import modules.appdata as appdata
 
+
+# Error Logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+handler = logging.FileHandler("main.log", mode="w")
+formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s -> %(message)s")
+handler.setFormatter(formatter)
+
+logger.addHandler(handler)
 
 # TODO: Create file with motivational quotes
 
@@ -73,12 +84,19 @@ def create_goal_layout (RBClass, edit):
 if __name__ == "__main__":
 
     # Load program class:
-    program = appdata.load()
-    print(program)
+    try:
+        program = appdata.load()
+    except Exception as e:
+        logger.error("Unable to load program class", exc_info=True) 
+    else:
+        logger.info("Loading program class...")
+        if not program is None:
+            logger.info("Loaded program class")
+
     # If program class was not yet created, init new one.
     # TODO: init new class if changes were made in class too 
     if program is None:
-        print("Initializing new program instance...")
+        logger.info("Initializing new program instance...")
         program = RBProgram()
 
 
@@ -93,8 +111,9 @@ if __name__ == "__main__":
         event, values = window.read()
 
         # For debugging:
-        print(event)
-        print(values, "\n")
+        def __str__():
+            return values
+        logger.debug( "{} {}".format(event, values) )
 
         if event in (None, 'Cancel'):
             break
@@ -130,7 +149,13 @@ if __name__ == "__main__":
         if event in ("NoFap"):
             webbrowser.open("https://nofap.com/")
     # End:
-    appdata.save(program)
-    window.close()
+    try:
+        appdata.save(program)
+    except Exception as e:
+        logger.error("Failed to save", exc_info=True)
+    else:
+        window.close()
+        logger.info("Save succesful")
+        
 
     # TODO: Save data and log on program crash
