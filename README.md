@@ -1,2 +1,2 @@
 # TheReBootProgram
-Get your addiction uder control with The ReBoot Program
+Get your addiction under control with The ReBoot Program
