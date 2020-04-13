@@ -2,20 +2,22 @@ import PySimpleGUI.PySimpleGUI as sg
 import random as rn
 import webbrowser
 import logging
+import urllib.request as url
+import requests
 
 from modules.quotes import quotes_load
 import modules.appdata as appdata
 
 
-# Error Logging
-logger = logging.getLogger(__name__)
+# TODO: Put this somewhere 
+logger= logging.getLogger(__name__)
+    
 logger.setLevel(logging.DEBUG)
-
 handler = logging.FileHandler("main.log", mode="w")
 formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s -> %(message)s")
 handler.setFormatter(formatter)
-
 logger.addHandler(handler)
+
 
 # TODO: Create file with motivational quotes
 
@@ -84,21 +86,13 @@ def create_goal_layout (RBClass, edit):
 if __name__ == "__main__":
 
     # Load program class:
-    try:
-        program = appdata.load()
-    except Exception as e:
-        logger.error("Unable to load program class", exc_info=True) 
-    else:
-        logger.info("Loading program class...")
-        if not program is None:
-            logger.info("Loaded program class")
+    program = appdata.load()
 
     # If program class was not yet created, init new one.
     # TODO: init new class if changes were made in class too 
     if program is None:
-        logger.info("Initializing new program instance...")
         program = RBProgram()
-
+        logger.info("Initialized new program instance")
 
     # Create window:
     quote_data = quotes_load()
@@ -113,7 +107,7 @@ if __name__ == "__main__":
         # For debugging:
         def __str__():
             return values
-        logger.debug( "{} {}".format(event, values) )
+        logger.debug(f"{event} {values}")
 
         if event in (None, 'Cancel'):
             break
@@ -133,29 +127,54 @@ if __name__ == "__main__":
                 g_event, g_value = goal_window.read()
 
                 # Throws TypeError
-                if g_event in (None, "Close"):
-                    goal_window.Close()
-                
+                try:
+                    if g_event in ("Close"):
+                        goal_window.Close()
+                        logger.info("Window closed")
+                except TypeError as e:
+                    logger.error("Expected 'TypeError'", exc_info=True)
+                    break
+
                 # Throws TypeError
-                if g_event in ("OK"):
-                    # TODO: Save values to program class here
-                    print(g_value["-duration-"], g_value["-date-"])
-                    goal_window.Close()
+                try:
+                    if g_event in ("OK"):
+                        # TODO: Save values to program class here
+                        def __str__():
+                            return logger.debug(g_value["-duration-"], g_value["-date-"])
+
+                        goal_window.Close()
+                except TypeError as e:
+                    logger.error("Expected 'TypeError'", exc_info=True)
+                    break
 
         # Events from help menu:
         if event in ("Github Page"):
-            webbrowser.open("https://github.com/LittlepawD/TheReBootProgram")
+            # Catch connection errors
+            github_url = "https://github.com/LittlepawD/TheReBootProgram"
+            try:
+                requests.get(github_url).raise_for_status()
+            except requests.HTTPError as connection_error:
+                github_status = requests.head(github_url).status_code
+                logger.error(f"{github_status} Unable to connect to {github_url}")
+            else:
+                logger.info(f"Connection to {github_url} successful")    
+                webbrowser.open(github_url)
 
         if event in ("NoFap"):
-            webbrowser.open("https://nofap.com/")
+            nofap_url = "https://nofap.com"
+            try:
+                requests.get(nofap_url).raise_for_status()
+                #TODO: Doesn't respond when this exception is caught
+            except requests.HTTPError as connection_error:
+                nofap_status = requests.head(nofap_url).status_code
+                logger.error(f"{nofap_status} Unable to connect to webpage {nofap_url}")
+            else:
+                logger.info(f"Connection to {nofap_url} successful")
+                webbrowser.open(nofap_url)
     # End:
-    try:
-        appdata.save(program)
-    except Exception as e:
-        logger.error("Failed to save", exc_info=True)
-    else:
-        window.close()
-        logger.info("Save succesful")
-        
-
-    # TODO: Save data and log on program crash
+        try:
+            # TODO: Save data and log on program crash
+            appdata.save(program)
+        except Exception as e: 
+            logger.error("Program crash")
+            
