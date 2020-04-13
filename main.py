@@ -125,31 +125,29 @@ if __name__ == "__main__":
             goal_window = sg.Window("Set Goal", goal_layout)
             while True:
                 g_event, g_value = goal_window.read()
+                
+                logger.debug(f"Goal window: {event} {values}")
 
                 # Throws TypeError
                 try:
                     if g_event in ("Close"):
                         goal_window.Close()
-                        logger.info("Window closed")
-                except TypeError as e:
-                    logger.error("Expected 'TypeError'", exc_info=True)
-                    break
+                        logger.info("Goal window closed without saving")
 
-                # Throws TypeError
-                try:
                     if g_event in ("OK"):
                         # TODO: Save values to program class here
                         def __str__():
                             return logger.debug(g_value["-duration-"], g_value["-date-"])
-
                         goal_window.Close()
+                        logger.info("Goal window closed (with save)")
+
                 except TypeError as e:
                     logger.error("Expected 'TypeError'", exc_info=True)
                     break
 
         # Events from help menu:
         if event in ("Github Page"):
-            # Catch connection errors
+            # Catch connection errors - this feel 
             github_url = "https://github.com/LittlepawD/TheReBootProgram"
             try:
                 requests.get(github_url).raise_for_status()
