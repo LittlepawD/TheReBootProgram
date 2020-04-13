@@ -158,17 +158,11 @@ if __name__ == "__main__":
                 logger.info(f"Connection to {github_url} successful")    
                 webbrowser.open(github_url)
 
+        if event in ("Github Page"):
+            webbrowser.open("https://github.com/LittlepawD/TheReBootProgram")
+
         if event in ("NoFap"):
-            nofap_url = "https://nofap.com"
-            try:
-                requests.get(nofap_url).raise_for_status()
-                #TODO: Doesn't respond when this exception is caught
-            except requests.HTTPError as connection_error:
-                nofap_status = requests.head(nofap_url).status_code
-                logger.error(f"{nofap_status} Unable to connect to webpage {nofap_url}")
-            else:
-                logger.info(f"Connection to {nofap_url} successful")
-                webbrowser.open(nofap_url)
+            webbrowser.open("https://nofap.com/")
     # End:
         try:
             # TODO: Save data and log on program crash
