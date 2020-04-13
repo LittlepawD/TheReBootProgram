@@ -2,7 +2,6 @@ import PySimpleGUI.PySimpleGUI as sg
 import random as rn
 import webbrowser
 import logging
-import urllib.request as url
 import requests
 
 from modules.quotes import quotes_load
@@ -87,6 +86,7 @@ if __name__ == "__main__":
 
     # Load program class:
     program = appdata.load()
+    logger.debug(program)
 
     # If program class was not yet created, init new one.
     # TODO: init new class if changes were made in class too 
