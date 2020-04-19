@@ -2,7 +2,6 @@ import PySimpleGUI.PySimpleGUI as sg
 import random as rn
 import webbrowser
 import logging
-import requests
 
 from modules.quotes import quotes_load
 import modules.appdata as appdata
@@ -146,18 +145,6 @@ if __name__ == "__main__":
                     break
 
         # Events from help menu:
-        if event in ("Github Page"):
-            # Catch connection errors - this feel 
-            github_url = "https://github.com/LittlepawD/TheReBootProgram"
-            try:
-                requests.get(github_url).raise_for_status()
-            except requests.HTTPError as connection_error:
-                github_status = requests.head(github_url).status_code
-                logger.error(f"{github_status} Unable to connect to {github_url}")
-            else:
-                logger.info(f"Connection to {github_url} successful")    
-                webbrowser.open(github_url)
-
         if event in ("Github Page"):
             webbrowser.open("https://github.com/LittlepawD/TheReBootProgram")
 
