@@ -34,6 +34,9 @@ class RBProgram:
     def set_goal(self, goal):
         self.goal = goal
 
+    # TODO: Method that updates self.streak based on days elapsed from start date
+    def streak_update(self):
+        pass
 
 if __name__ == "__main__":
 
@@ -75,8 +78,8 @@ if __name__ == "__main__":
             goal_layout = layouts.create_goal_layout(program, edit)
             # Kinda buggy when new widnow is opened, try fixing it
             goal_window = sg.Window("Set Goal", goal_layout)
-            while True:
-                g_event, g_value = goal_window.read()
+            while goal_window:
+                g_event, g_values = goal_window.read()
                 
                 logger.debug(f"Goal window: {event} {values}")
 
@@ -84,18 +87,39 @@ if __name__ == "__main__":
                 try:
                     if g_event in ("Close"):
                         goal_window.Close()
+                        del goal_window
+                        break
+
                         logger.info("Goal window closed without saving")
 
                     if g_event in ("OK"):
                         # TODO: Save values to program class here
                         def __str__():
-                            return logger.debug(g_value["-duration-"], g_value["-date-"])
+                            return logger.debug(g_values["-duration-"], g_values["-date-"])
+                        
+                        program.goal = g_values["-duration-"]
+                        program.start_date = g_values["-date-"]
+                        program.why_I_quit = g_values["-whyIquit-"].strip()
+
                         goal_window.Close()
+                        del goal_window
+                        break
+
                         logger.info("Goal window closed (with save)")
 
                 except TypeError as e:
                     logger.error("Expected 'TypeError'", exc_info=True)
+                    goal_window.close()
+                    del goal_window
+                    logger.error("Goal window closed with error.")
                     break
+            
+            # Update Main window so changes take effect:
+            window["-goal-"].update(program.goal)
+            # To implement:
+            # window["-streak-"].update(program.streak_update())
+            # change callendar section according to new goal
+
 
         # Events from help menu:
         if event in ("Github Page"):

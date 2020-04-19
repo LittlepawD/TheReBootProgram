@@ -1,5 +1,7 @@
 import PySimpleGUI as sg
+from datetime import date
 from modules.quotes import quotes_load
+
 
 def create_main_layout(program):
     menu_def = [["&Goal", ["New Goal", "Edit Goal",]],
@@ -9,9 +11,11 @@ def create_main_layout(program):
     options_bar = [sg.Menu(menu_def)]
 
     streak_bar_font = ("Helvetica", 20)
-    streak_bar = [sg.Text(f"Streak: {program.streak}", font=streak_bar_font),
+    streak_bar = [sg.Text(f"Streak:", font=streak_bar_font),
+                sg.Text(program.streak, font=streak_bar_font, key="-streak-"),
                 sg.VerticalSeparator(),
-                sg.Text(f"Goal: {program.goal}", font=streak_bar_font)]
+                sg.Text(f"Goal:", font=streak_bar_font),
+                sg.Text(program.goal, font=streak_bar_font, key="-goal-")]
 
     quote_data = quotes_load()
     quote = [sg.Text(quote_data)]
@@ -37,15 +41,20 @@ def create_goal_layout (program, edit):
     if edit:
         goal_val = program.goal
         startdate_val = program.start_date
+        why_I_q = program.why_I_quit
     else:
         goal_val = 30
-        startdate_val = None
+        startdate_val = date.today().isoformat()
+        why_I_q = ""
+
+    # Date formating example here. Change accordingly.
  
     layout = [[sg.Text("Duration of challange: "), sg.Spin([n for n in range(1,1000)], goal_val, key="-duration-")],
         # TODO add today date and date handling using datetime
-            [sg.Text("I'm starting on "), sg.InputText("todaydate", key="-date-")],
+            [sg.Text("I'm starting on "), sg.InputText(startdate_val, key="-date-")],
             [sg.Text("This is why I want to quit:")],
-            [sg.Multiline(program.why_I_quit, key="-whyIquit-")],
+            [sg.Multiline(why_I_q, key="-whyIquit-")],
             [sg.Button("OK"), sg.CloseButton("Close")]]
+
     return layout
 
