@@ -3,8 +3,9 @@ import random as rn
 import webbrowser
 import logging
 
-from modules.quotes import quotes_load
+import modules.layouts as layouts
 import modules.appdata as appdata
+
 
 
 # TODO: Put this somewhere 
@@ -33,53 +34,6 @@ class RBProgram:
     def set_goal(self, goal):
         self.goal = goal
 
-# TODO: Move layouts creations to layouts module
-def create_layout(RBClass):
-    menu_def = [["&Goal", ["New Goal", "Edit Goal",]],
-                 ["&Diary", ["Open", "Export",]],
-                 ["&Options"],
-                 ["Help", ["Github Page", "NoFap"]]]
-    options_bar = [sg.Menu(menu_def)]
-
-    streak_bar_font = ("Helvetica", 20)
-    streak_bar = [sg.Text(f"Streak: {RBClass.streak}", font=streak_bar_font),
-                sg.VerticalSeparator(),
-                sg.Text(f"Goal: {RBClass.goal}", font=streak_bar_font)]
-
-    quote = [sg.Text(quote_data)]
-
-    col_calendar = [[sg.Text("Calendar placeholder")]]
-    col_buttons = [[sg.Button("Calendar f1")],
-                    [sg.Button("Calendar f2")],
-                    [sg.Button("Calendar f3")]]
-    calendar_bar = [sg.Frame("Calendar", col_calendar, size=(350, 260)), 
-                    sg.Column(col_buttons, element_justification="center",)]
-
-    layout = [
-        options_bar,
-        streak_bar,
-        quote,
-        calendar_bar]
-
-    return layout
-
-def create_goal_layout (RBClass, edit):
-    # To put to respective elements
-    if edit:
-        goal_val = RBClass.goal
-        startdate_val = RBClass.start_date
-    else:
-        goal_val = 30
-        startdate_val = None
- 
-    layout = [[sg.Text("Duration of challange: "), sg.Spin([n for n in range(1,1000)], goal_val, key="-duration-")],
-        # TODO add today date and date handling using datetime
-            [sg.Text("I'm starting on "), sg.InputText("todaydate", key="-date-")],
-            [sg.Text("This is why I want to quit:")],
-            [sg.Multiline(RBClass.why_I_quit, key="-whyIquit-")],
-            [sg.Button("OK"), sg.CloseButton("Close")]]
-    return layout
-
 
 if __name__ == "__main__":
 
@@ -94,9 +48,8 @@ if __name__ == "__main__":
         logger.info("Initialized new program instance")
 
     # Create window:
-    quote_data = quotes_load()
     sg.theme("DarkBrown1")
-    layout = create_layout(program)
+    layout = layouts.create_main_layout(program)
     window = sg.Window("The Rebooot program", layout,  resizable=True, icon=None)  # TODO: add custom icon
 
     # Mainloop:
@@ -119,7 +72,7 @@ if __name__ == "__main__":
                 edit = False
 
             # Create and launch goal window, blocking:
-            goal_layout = create_goal_layout(program, edit)
+            goal_layout = layouts.create_goal_layout(program, edit)
             # Kinda buggy when new widnow is opened, try fixing it
             goal_window = sg.Window("Set Goal", goal_layout)
             while True:
