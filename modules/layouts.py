@@ -9,6 +9,7 @@ def create_main_layout(program):
                  ["&Options"],
                  ["Help", ["Github Page", "NoFap"]]]
     options_bar = [sg.Menu(menu_def)]
+    # TODO: Fix menu bar not displaying on MacOS
 
     streak_bar_font = ("Helvetica", 20)
     streak_bar = [sg.Text(f"Streak:", font=streak_bar_font),
@@ -40,15 +41,13 @@ def create_goal_layout (program, edit):
     # To put to respective elements
     if edit:
         goal_val = program.goal
-        startdate_val = program.start_date
+        startdate_val = program.start_date.isoformat()
         why_I_q = program.why_I_quit
     else:
         goal_val = 30
         startdate_val = date.today().isoformat()
         why_I_q = ""
 
-    # Date formating example here. Change accordingly.
- 
     layout = [[sg.Text("Duration of challange: "), sg.Spin([n for n in range(1,1000)], goal_val, key="-duration-")],
         # TODO add today date and date handling using datetime
             [sg.Text("I'm starting on "), sg.InputText(startdate_val, key="-date-")],

@@ -2,6 +2,7 @@ import PySimpleGUI.PySimpleGUI as sg
 import random as rn
 import webbrowser
 import logging
+from datetime import date
 
 import modules.layouts as layouts
 import modules.appdata as appdata
@@ -21,8 +22,21 @@ logger.addHandler(handler)
 # TODO: Create file with motivational quotes
 
 class RBProgram:
+    """ Class representing the reboot program.
+
+    Attributes:
+        self.has_goal {bool} -- helps track if goal was already set. 
+        self.goal {int} -- length of the goal in days.
+        self.startdate {datetime.date} -- Day when goal was started as datetime date object.
+        self.streak {int} -- number of days elapsed from startdate.
+        self.why_I_quit {str}
+
+    Methods:
+
+    """    
     # TODO: Eventually move this to a separate module
     def __init__(self):
+        self.has_goal = False
         self.goal = None
         self.streak = None
         self.start_date = None
@@ -31,12 +45,24 @@ class RBProgram:
     def __str__(self):
         return f"{self.goal} days goal started on {self.start_date}."
 
-    def set_goal(self, goal):
+    def set_goal(self, goal, startdate=None, why_I_quit=""):
+        """ Set program atributes from parameters.
+        Arguments:
+            goal {int} -- length of the goal in days.
+            startdate {str} -- String representing startdate in isoformat (YYYY-MM-DD). If None, today date is set. (default: {None})
+            why_I_quit {str} -- (default: {""})
+        """
         self.goal = goal
+        if not startdate:
+            self.start_date = date.today()
+        else:
+            self.start_date = date.fromisoformat(startdate)
+        self.why_I_quit = why_I_quit
+        logger.info(f"set_goal: New goal set - {self}")
 
-    # TODO: Method that updates self.streak based on days elapsed from start date
     def streak_update(self):
-        pass
+        self.streak = (date.today() - self.start_date).days
+        logger.debug(f"Streak updated -- {self.streak}")
 
 if __name__ == "__main__":
 
@@ -45,10 +71,13 @@ if __name__ == "__main__":
     logger.debug(program)
 
     # If program class was not yet created, init new one.
-    # TODO: init new class if changes were made in class too 
+    # TODO: init new class and migrate data if changes were made in the code 
     if program is None:
         program = RBProgram()
         logger.info("Initialized new program instance")
+    else:
+        # If there is existing program, update streak
+        program.streak_update()
 
     # Create window:
     sg.theme("DarkBrown1")
@@ -62,14 +91,14 @@ if __name__ == "__main__":
         # For debugging:
         def __str__():
             return values
-        logger.debug(f"{event} {values}")
+        logger.debug(f"Main window: {event} {values}")
 
         if event in (None, 'Cancel'):
             break
 
         #Events from goal menu:
         if event in ("Edit Goal", "New Goal"):
-            if event == "Edit Goal":
+            if event == "Edit Goal" and program.goal:
                 edit = True
             else: 
                 edit = False
@@ -83,29 +112,33 @@ if __name__ == "__main__":
                 
                 logger.debug(f"Goal window: {event} {values}")
 
-                # Throws TypeError
                 try:
                     if g_event in ("Close"):
                         goal_window.Close()
                         del goal_window
                         break
 
-                        logger.info("Goal window closed without saving")
+                        logger.debug("Goal window closed properly without saving")
 
                     if g_event in ("OK"):
-                        # TODO: Save values to program class here
                         def __str__():
                             return logger.debug(g_values["-duration-"], g_values["-date-"])
                         
-                        program.goal = g_values["-duration-"]
-                        program.start_date = g_values["-date-"]
-                        program.why_I_quit = g_values["-whyIquit-"].strip()
+                        # Save new values to program class:
+                        # TODO: Check that date was entered in proper format
+                        program.set_goal(g_values["-duration-"], g_values["-date-"], g_values["-whyIquit-"].strip())
 
+                        # Update Main window so changes take effect:
+                        window["-goal-"].update(program.goal)
+                        program.streak_update()
+                        window["-streak-"].update(program.streak)
+                        # TODO change callendar section according to new goal
+
+                        # Close goal window
                         goal_window.Close()
                         del goal_window
+                        logger.debug("Goal window closed properly with save.")
                         break
-
-                        logger.info("Goal window closed (with save)")
 
                 except TypeError as e:
                     logger.error("Expected 'TypeError'", exc_info=True)
@@ -114,13 +147,7 @@ if __name__ == "__main__":
                     logger.error("Goal window closed with error.")
                     break
             
-            # Update Main window so changes take effect:
-            window["-goal-"].update(program.goal)
-            # To implement:
-            # window["-streak-"].update(program.streak_update())
-            # change callendar section according to new goal
-
-
+            
         # Events from help menu:
         if event in ("Github Page"):
             webbrowser.open("https://github.com/LittlepawD/TheReBootProgram")
@@ -129,8 +156,8 @@ if __name__ == "__main__":
             webbrowser.open("https://nofap.com/")
     # End:
         try:
-            # TODO: Save data and log on program crash
-            appdata.save(program)
+            if program.goal:
+                appdata.save(program)
         except Exception as e: 
             logger.error("Program crash")
             
