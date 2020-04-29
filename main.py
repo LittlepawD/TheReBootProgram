@@ -83,7 +83,6 @@ def mainloop():
             goal_window = sg.Window("Set Goal", goal_layout)
             while goal_window:
                 g_event, g_values = goal_window.read()
-                
                 logger.debug(f"Goal window: {event} {values}")
 
                 try:

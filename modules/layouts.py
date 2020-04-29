@@ -36,6 +36,16 @@ def create_main_layout(program):
 
     return layout
 
+def create_calendar_section(program):
+    day_bar = [sg.T("Mon"), sg.("Tue"), sg.T("Wen"), sg.T("Thu"), sg.T("Fri"), sg.T("Sat"), sg.T("Sun")]
+
+    # TODO create clickable box - objet representing day
+    # to have calendar with goal starting at correct weekday, insert empty boxes in the first row.
+    no_insert_columns = program.start_date.weekday()
+    first_row = []
+    # skip first row and start creating the second
+    for day in range(7 - no_insert_columns, program.goal, 1):
+        []
 
 def create_goal_layout (program, edit):
     # To put to respective elements
