@@ -49,7 +49,6 @@ def create_goal_layout (program, edit):
         why_I_q = ""
 
     layout = [[sg.Text("Duration of challange: "), sg.Spin([n for n in range(1,1000)], goal_val, key="-duration-")],
-        # TODO add today date and date handling using datetime
             [sg.Text("I'm starting on "), sg.InputText(startdate_val, key="-date-")],
             [sg.Text("This is why I want to quit:")],
             [sg.Multiline(why_I_q, key="-whyIquit-")],

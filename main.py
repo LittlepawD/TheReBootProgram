@@ -7,18 +7,6 @@ from datetime import date
 import modules.layouts as layouts
 import modules.appdata as appdata
 
-
-
-# TODO: Put this somewhere 
-logger= logging.getLogger(__name__)
-    
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler("main.log", mode="w")
-formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s -> %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-
 # TODO: Create file with motivational quotes
 
 class RBProgram:
@@ -60,25 +48,11 @@ class RBProgram:
         self.why_I_quit = why_I_quit
         logger.info(f"set_goal: New goal set - {self}")
 
-    def streak_update(self):
+    def update_streak(self):
         self.streak = (date.today() - self.start_date).days
         logger.debug(f"Streak updated -- {self.streak}")
 
-if __name__ == "__main__":
-
-    # Load program class:
-    program = appdata.load()
-    logger.debug(program)
-
-    # If program class was not yet created, init new one.
-    # TODO: init new class and migrate data if changes were made in the code 
-    if program is None:
-        program = RBProgram()
-        logger.info("Initialized new program instance")
-    else:
-        # If there is existing program, update streak
-        program.streak_update()
-
+def mainloop():
     # Create window:
     sg.theme("DarkBrown1")
     layout = layouts.create_main_layout(program)
@@ -130,7 +104,7 @@ if __name__ == "__main__":
 
                         # Update Main window so changes take effect:
                         window["-goal-"].update(program.goal)
-                        program.streak_update()
+                        program.update_streak()
                         window["-streak-"].update(program.streak)
                         # TODO change callendar section according to new goal
 
@@ -154,10 +128,35 @@ if __name__ == "__main__":
 
         if event in ("NoFap"):
             webbrowser.open("https://nofap.com/")
+
+if __name__ == "__main__":
+    
+    # Init logger
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    handler = logging.FileHandler("main.log", mode="w")
+    formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s -> %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    # Load program class:
+    program = appdata.load()
+    logger.debug(program)
+
+    # If program class was not yet created, init new one.
+    # TODO: init new class and migrate data if changes were made in the code 
+    if program is None:
+        program = RBProgram()
+        logger.info("Initialized new program instance")
+    else:
+        # If there is existing program, update streak
+        program.update_streak()
+
+    mainloop()
+
     # End:
-        try:
-            if program.goal:
-                appdata.save(program)
-        except Exception as e: 
-            logger.error("Program crash")
-            
+    try:
+        if program.goal:
+            appdata.save(program)
+    except Exception as e: 
+        logger.error("Program crash")
