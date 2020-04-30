@@ -21,31 +21,51 @@ def create_main_layout(program):
     quote_data = quotes_load()
     quote = [sg.Text(quote_data)]
 
-    col_calendar = [[sg.Text("Calendar placeholder")]]
-    col_buttons = [[sg.Button("Calendar f1")],
+    calendar_content = create_calendar(program)
+    col_buttons = [[sg.Button("Calendar f1", focus=True)],
                     [sg.Button("Calendar f2")],
                     [sg.Button("Calendar f3")]]
-    calendar_bar = [sg.Frame("Calendar", col_calendar, size=(350, 260)), 
+    calendar_row = [sg.Frame("", calendar_content, size=(350, 260)), 
                     sg.Column(col_buttons, element_justification="center",)]
 
     layout = [
         options_bar,
         streak_bar,
         quote,
-        calendar_bar]
+        calendar_row]
 
     return layout
 
-def create_calendar_section(program):
-    day_bar = [sg.T("Mon"), sg.("Tue"), sg.T("Wen"), sg.T("Thu"), sg.T("Fri"), sg.T("Sat"), sg.T("Sun")]
+def calendar_box(text="", bt_color=None, enabled=True):
+    """Creates button - single calendar box in format for constructing calendar.
 
-    # TODO create clickable box - objet representing day
+    Keyword Arguments:
+        text {str} -- box text (default: {""})
+        bt_color {("text_color", "box_color")} -- tuple specifying box colors (default: {None})
+        enabled {bool} -- box is clickable -> has key and makes events (default: {True})
+
+    Returns:
+        {PySimpleGUI.Button}
+    """
+    if enabled and text != "":
+        key = f"-D:{text}-"
+    else: key=None
+    # size is in no of characters, which kinda sucks
+    return sg.Btn(text, key=key, size=(3,1), button_color=bt_color, font="courier 13", pad=(0,0), disabled= not enabled)
+
+def create_calendar(program):
+    days = ["Mon", "Tue", "Wen", "Thu", "Fri", "Sat", "Sun"]
+    # TODO: find better colors for day boxes, these have too low contrast
+    day_bar = [calendar_box(day, enabled=False, bt_color=("white","black")) for day in days]
+
     # to have calendar with goal starting at correct weekday, insert empty boxes in the first row.
     no_insert_columns = program.start_date.weekday()
-    first_row = []
-    # skip first row and start creating the second
-    for day in range(7 - no_insert_columns, program.goal, 1):
-        []
+    # more or less for testing, this should happen in constructor loop:
+    first_row = [calendar_box(enabled=False, bt_color=("gray","gray")) for n in range(no_insert_columns)] \
+                + [calendar_box(str(n)) for n in range(7-no_insert_columns)]
+    calendar = [day_bar, first_row]
+
+    return calendar
 
 def create_goal_layout (program, edit):
     # To put to respective elements
@@ -65,4 +85,3 @@ def create_goal_layout (program, edit):
             [sg.Button("OK"), sg.CloseButton("Close")]]
 
     return layout
-
