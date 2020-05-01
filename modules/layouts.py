@@ -43,7 +43,6 @@ def calendar_box(text="", bt_color=None, enabled=True):
         text {str} -- box text (default: {""})
         bt_color {("text_color", "box_color")} -- tuple specifying box colors (default: {None})
         enabled {bool} -- box is clickable -> has key and makes events (default: {True})
-
     Returns:
         {PySimpleGUI.Button}
     """
@@ -59,12 +58,20 @@ def create_calendar(program):
     day_bar = [calendar_box(day, enabled=False, bt_color=("white","black")) for day in days]
 
     # to have calendar with goal starting at correct weekday, insert empty boxes in the first row.
-    no_insert_columns = program.start_date.weekday()
-    # more or less for testing, this should happen in constructor loop:
-    first_row = [calendar_box(enabled=False, bt_color=("gray","gray")) for n in range(no_insert_columns)] \
-                + [calendar_box(str(n)) for n in range(7-no_insert_columns)]
-    calendar = [day_bar, first_row]
-
+    # no_insert_columns = program.start_date.weekday()
+    no_insert_columns = 6
+    # first row of calendar:
+    calendar = [[calendar_box(enabled=False, bt_color=("gray","gray")) for n in range(no_insert_columns)] \
+                + [calendar_box(str(n)) for n in range(7-no_insert_columns)]]
+    for day in range(7 - no_insert_columns, program.goal - 7, 7):
+        row = [calendar_box(str(n)) for n in range(day, day + 7)]
+        calendar.append(row)
+    
+    # TODO Figure out how to create last row correctly! - consider variable length of goal and moving start date
+    days_in_last = 0
+    last_row = []
+    calendar.append(last_row)
+    calendar.insert(0, day_bar)
     return calendar
 
 def create_goal_layout (program, edit):
@@ -79,7 +86,7 @@ def create_goal_layout (program, edit):
         why_I_q = ""
 
     layout = [[sg.Text("Duration of challange: "), sg.Spin([n for n in range(1,1000)], goal_val, key="-duration-")],
-            [sg.Text("I'm starting on "), sg.InputText(startdate_val, key="-date-")],
+            [sg.Text("I'm starting on (day zero):"), sg.InputText(startdate_val, key="-date-")],
             [sg.Text("This is why I want to quit:")],
             [sg.Multiline(why_I_q, key="-whyIquit-")],
             [sg.Button("OK"), sg.CloseButton("Close")]]

@@ -105,7 +105,7 @@ def mainloop():
                         window["-goal-"].update(program.goal)
                         program.update_streak()
                         window["-streak-"].update(program.streak)
-                        # TODO change callendar section according to new goal
+                        # TODO update callendar section according to new goal
 
                         # Close goal window
                         goal_window.Close()
