@@ -21,11 +21,15 @@ def create_main_layout(program):
     quote_data = quotes_load()
     quote = [sg.Text(quote_data)]
 
-    calendar_content = create_calendar(program)
+    if program.has_goal:
+        calendar_content = create_calendar(program)
+    else:
+        calendar_content = [[sg.T("Goal not yet created!")]]
+
     col_buttons = [[sg.Button("Calendar f1", focus=True)],
                     [sg.Button("Calendar f2")],
                     [sg.Button("Calendar f3")]]
-    calendar_row = [sg.Frame("", calendar_content, size=(350, 260)), 
+    calendar_row = [sg.Frame("", calendar_content, size=(350, 260), key="-calendar-frame-"), 
                     sg.Column(col_buttons, element_justification="center",)]
 
     layout = [
@@ -53,25 +57,31 @@ def calendar_box(text="", bt_color=None, enabled=True):
     return sg.Btn(text, key=key, size=(3,1), button_color=bt_color, font="courier 13", pad=(0,0), disabled= not enabled)
 
 def create_calendar(program):
+    """Returns calendar to put into calendar frame
+    Arguments:
+        program {[RBProgram object]} - current program goal
+    Returns:
+        [2d-list] - rows with buttons representing days in calendar
+    """    
     days = ["Mon", "Tue", "Wen", "Thu", "Fri", "Sat", "Sun"]
     # TODO: find better colors for day boxes, these have too low contrast
     day_bar = [calendar_box(day, enabled=False, bt_color=("white","black")) for day in days]
+    # to have calendar with goal starting at correct weekday, insert empty boxes in the first row:
+    no_insert_columns = program.start_date.weekday()
 
-    # to have calendar with goal starting at correct weekday, insert empty boxes in the first row.
-    # no_insert_columns = program.start_date.weekday()
-    no_insert_columns = 6
     # first row of calendar:
-    calendar = [[calendar_box(enabled=False, bt_color=("gray","gray")) for n in range(no_insert_columns)] \
-                + [calendar_box(str(n)) for n in range(7-no_insert_columns)]]
+    calendar = [day_bar, [calendar_box(enabled=False, bt_color=("gray","gray")) for n in range(no_insert_columns)] \
+                + [calendar_box(str(day)) for day in range(7-no_insert_columns)]]
+    days_created = 7 - no_insert_columns
+
+    # calendar body:
     for day in range(7 - no_insert_columns, program.goal - 7, 7):
         row = [calendar_box(str(n)) for n in range(day, day + 7)]
         calendar.append(row)
-    
-    # TODO Figure out how to create last row correctly! - consider variable length of goal and moving start date
-    days_in_last = 0
-    last_row = []
+        days_created += 7
+    last_row = [calendar_box(str(day)) for day in range(days_created, program.goal + 1)]
+    last_row += [calendar_box(enabled=False, bt_color=("gray","gray")) for n in range(len(last_row),7)]
     calendar.append(last_row)
-    calendar.insert(0, day_bar)
     return calendar
 
 def create_goal_layout (program, edit):
