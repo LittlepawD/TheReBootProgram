@@ -41,6 +41,7 @@ class RBProgram:
             why_I_quit {str} -- (default: {""})
         """
         self.goal = goal
+        self.has_goal = True
         if not startdate:
             self.start_date = date.today()
         else:
@@ -83,7 +84,6 @@ def mainloop():
             goal_window = sg.Window("Set Goal", goal_layout)
             while goal_window:
                 g_event, g_values = goal_window.read()
-                
                 logger.debug(f"Goal window: {event} {values}")
 
                 try:
@@ -106,8 +106,12 @@ def mainloop():
                         window["-goal-"].update(program.goal)
                         program.update_streak()
                         window["-streak-"].update(program.streak)
-                        # TODO change callendar section according to new goal
 
+                        # TODO update callendar section after editing goal
+                        # window["-calendar-frame-"].add_row(layouts.create_calendar(program))
+                        # Doesn't work, if no other solution is found the main window will need to be restarted after goal change.
+                        window["-calendar-frame-"].update("Restart program to update calendar")
+                        
                         # Close goal window
                         goal_window.Close()
                         del goal_window
@@ -120,7 +124,6 @@ def mainloop():
                     del goal_window
                     logger.error("Goal window closed with error.")
                     break
-            
             
         # Events from help menu:
         if event in ("Github Page"):
