@@ -54,6 +54,7 @@ def calendar_box(text="", bt_color=None, enabled=True):
         key = f"-D:{text}-"
     else: key=None
     # size is in no of characters, which kinda sucks
+	# CHECK boxes are too wide in linux desktop, change size respectively
     return sg.Btn(text, key=key, size=(3,1), button_color=bt_color, font="courier 13", pad=(0,0), disabled= not enabled)
 
 def create_calendar(program):
