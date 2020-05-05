@@ -4,6 +4,9 @@ import webbrowser
 import logging
 from datetime import date
 
+# dev:
+import time
+
 import modules.layouts as layouts
 import modules.appdata as appdata
 
@@ -53,12 +56,23 @@ class RBProgram:
         self.streak = (date.today() - self.start_date).days
         logger.debug(f"Streak updated -- {self.streak}")
 
+    def update_days_colors(self, window):
+        """ Updates day colors in calendar - successful days green, today orange. """        
+        for day in range(self.streak):
+            window[f"-D:{day}-"].update(button_color=("white","green"))
+        window[f"-D:{self.streak}-"].update(button_color=("white", "orange"))
+        window[f"-D:{self.streak}-"].SetFocus()
+
 def mainloop():
     # Create window:
     sg.theme("DarkBrown1")
+    # debuging:
+    timer = time.time()
     layout = layouts.create_main_layout(program)
     window = sg.Window("The Rebooot program", layout,  resizable=True, icon=None)  # TODO: add custom icon
-
+    window.finalize()
+    program.update_days_colors(window)
+    logger.debug(f"Main window created in {time.time() - timer} s.")
     # Mainloop:
     while True:
         event, values = window.read()
@@ -108,9 +122,10 @@ def mainloop():
                         window["-streak-"].update(program.streak)
 
                         # TODO update callendar section after editing goal
-                        # window["-calendar-frame-"].add_row(layouts.create_calendar(program))
+                        # window["-calendar-frame-"].update(layout=layouts.create_calendar(program))
                         # Doesn't work, if no other solution is found the main window will need to be restarted after goal change.
                         window["-calendar-frame-"].update("Restart program to update calendar")
+                        program.update_days_colors(window)
                         
                         # Close goal window
                         goal_window.Close()

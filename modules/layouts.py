@@ -26,7 +26,7 @@ def create_main_layout(program):
     else:
         calendar_content = [[sg.T("Goal not yet created!")]]
 
-    col_buttons = [[sg.Button("Calendar f1", focus=True)],
+    col_buttons = [[sg.Button("Calendar f1")],
                     [sg.Button("Calendar f2")],
                     [sg.Button("Calendar f3")]]
     calendar_row = [sg.Frame("", calendar_content, size=(350, 260), key="-calendar-frame-"), 
@@ -80,6 +80,7 @@ def create_calendar(program):
         row = [calendar_box(str(n)) for n in range(day, day + 7)]
         calendar.append(row)
         days_created += 7
+    # TODO Fix bug where 8 days appear in last row if second row starts with first day.
     last_row = [calendar_box(str(day)) for day in range(days_created, program.goal + 1)]
     last_row += [calendar_box(enabled=False, bt_color=("gray","gray")) for n in range(len(last_row),7)]
     calendar.append(last_row)
