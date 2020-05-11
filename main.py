@@ -71,7 +71,8 @@ def mainloop():
     layout = layouts.create_main_layout(program)
     window = sg.Window("The Rebooot program", layout,  resizable=True, icon=None)  # TODO: add custom icon
     window.finalize()
-    program.update_days_colors(window)
+    if program.has_goal:
+        program.update_days_colors(window)
     logger.debug(f"Main window created in {time.time() - timer} s.")
     # Mainloop:
     while True:
@@ -121,11 +122,12 @@ def mainloop():
                         program.update_streak()
                         window["-streak-"].update(program.streak)
 
-                        # TODO update callendar section after editing goal
+                        # TODO update callendar section after editing goal!!!
                         # window["-calendar-frame-"].update(layout=layouts.create_calendar(program))
                         # Doesn't work, if no other solution is found the main window will need to be restarted after goal change.
                         window["-calendar-frame-"].update("Restart program to update calendar")
-                        program.update_days_colors(window)
+                        # Doesn't work without calendar section update
+                        # program.update_days_colors(window)
                         
                         # Close goal window
                         goal_window.Close()

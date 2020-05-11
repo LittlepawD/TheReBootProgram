@@ -8,7 +8,6 @@ verify_ssl = true
 [packages]
 pysimplegui = "*"
 requests = "*"
-# TODO: remove tkcalendar
 
 [requires]
 python_version = "3.7"
