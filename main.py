@@ -61,10 +61,16 @@ class RBProgram:
 
     def update_days_colors(self, window):
         """ Updates day colors in calendar - successful days green, today orange. """
-        for day in range(self.streak):
+        if self.streak >= self.goal:
+            stop = self.goal
+        else:
+            stop = self.streak
+
+        for day in range(stop + 1):
             window[f"-D:{day}-"].update(button_color=("white", "green"))
-        window[f"-D:{self.streak}-"].update(button_color=("white", "orange"))
-        window[f"-D:{self.streak}-"].SetFocus()
+        window[f"-D:{stop}-"].SetFocus()
+        if stop != self.goal:
+            window[f"-D:{stop}-"].update(button_color=("white", "orange"))
 
 def mainloop():
     # Create window:
